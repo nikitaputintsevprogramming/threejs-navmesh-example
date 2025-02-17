@@ -99,6 +99,7 @@ loader.load('./glb/map-level-navmesh.glb', (gltf: GLTF) => {
     });
 });
 
+
 // RAYCASTING
 const raycaster = new THREE.Raycaster(); // create once
 const clickMouse = new THREE.Vector2();  // create once
@@ -218,14 +219,23 @@ let canSelectPoint = false;
 let canStartPathDrawing = false;
 let canMoveAgent = false;
 
+// Флаги для управления движением и отрисовкой пути
+let isMovingAgent = false;
+let isDrawingPath = false;
+
+// Изменяем кнопки, чтобы запускать соответствующие процессы
 createButton('Выбор точки', () => {
     canSelectPoint = true;
     canStartPathDrawing = false;
     canMoveAgent = false;
+    isMovingAgent = false;
+    isDrawingPath = false;
 });
 
 createButton('Запуск анимации маршрута', () => {
     if (navpath && navpath.length > 0) {
+        isDrawingPath = true;
+        isMovingAgent = false;
         canStartPathDrawing = true;
         canSelectPoint = false;
         canMoveAgent = false;
@@ -235,20 +245,23 @@ createButton('Запуск анимации маршрута', () => {
 
 createButton('Движение агента', () => {
     if (navpath && navpath.length > 0) {
+        isMovingAgent = true;
+        isDrawingPath = false;
         canMoveAgent = true;
         canStartPathDrawing = false;
         canSelectPoint = false;
     }
 });
 
-// GAMELOOP
+// Обновленный игровой цикл
 const clock = new THREE.Clock();
-let gameLoop = () => {
+const gameLoop = () => {
     const delta = clock.getDelta();
-    move(delta);
-    drawPathLine(delta);
-    orbitControls.update()
+    if (isMovingAgent) move(delta);
+    if (isDrawingPath) drawPathLine(delta);
+    orbitControls.update();
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
 };
+
 gameLoop();
