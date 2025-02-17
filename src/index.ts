@@ -200,4 +200,48 @@ let gameLoop = () => {
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
 };
+
+
+
+const buttonContainer = document.createElement('div');
+buttonContainer.style.position = 'absolute';
+buttonContainer.style.top = '10px';
+buttonContainer.style.right = '10px';
+buttonContainer.style.display = 'flex';
+buttonContainer.style.flexDirection = 'column';
+buttonContainer.style.gap = '10px';
+
+const createButton = (text: string) => {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.style.padding = '10px 20px';
+    button.style.fontSize = '16px';
+    button.addEventListener('click', () => {
+        console.log(`${text} clicked!`);
+    });
+    return button;
+};
+
+buttonContainer.appendChild(createButton('Button 1'));
+buttonContainer.appendChild(createButton('Button 2'));
+buttonContainer.appendChild(createButton('Button 3'));
+
+document.body.appendChild(buttonContainer);
+
+const geometry = new THREE.BoxGeometry();
+const material = new THREE.MeshBasicMaterial({ color: 0x00ff00 });
+const cube = new THREE.Mesh(geometry, material);
+
+scene.add(cube);
+camera.position.z = 5;
+
+const animate = function () {
+  requestAnimationFrame(animate);
+  cube.rotation.x += 0.01;
+  cube.rotation.y += 0.01;
+  renderer.render(scene, camera);
+};
+
+animate();
+
 gameLoop();
