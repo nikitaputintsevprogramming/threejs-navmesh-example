@@ -190,6 +190,60 @@ function drawPathLine(delta: number) {
     scene.add(pathLine);
 }
 
+
+// UI BUTTONS
+const uiContainer = document.createElement('div');
+uiContainer.className = 'controls-container';
+uiContainer.style.position = 'absolute';
+uiContainer.style.top = '10px';
+uiContainer.style.left = '10px';
+uiContainer.style.zIndex = '100';
+uiContainer.style.display = 'flex';
+uiContainer.style.flexDirection = 'column'; // Добавляем, чтобы кнопки были в столбик
+uiContainer.style.gap = '10px';
+
+document.body.appendChild(uiContainer);
+
+const createButton = (text, onClick) => {
+    const button = document.createElement('button');
+    button.innerText = text;
+    button.style.margin = '5px';
+    button.style.padding = '10px';
+    button.style.cursor = 'pointer';
+    button.onclick = onClick;
+    uiContainer.appendChild(button);
+};
+
+let canSelectPoint = false;
+let canStartPathDrawing = false;
+let canMoveAgent = false;
+
+createButton('Выбор точки', () => {
+    canSelectPoint = true;
+    canStartPathDrawing = false;
+    canMoveAgent = false;
+});
+
+createButton('Запуск анимации маршрута', () => {
+    if (navpath && navpath.length > 0) {
+        canStartPathDrawing = true;
+        canSelectPoint = false;
+        canMoveAgent = false;
+        lineDrawProgress = 0;
+    }
+});
+
+createButton('Движение агента', () => {
+    if (navpath && navpath.length > 0) {
+        canMoveAgent = true;
+        canStartPathDrawing = false;
+        canSelectPoint = false;
+    }
+});
+
+
+
+
 // GAMELOOP
 const clock = new THREE.Clock();
 let gameLoop = () => {
