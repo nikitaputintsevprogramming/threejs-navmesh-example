@@ -76,7 +76,7 @@ scene.add(agentGroup);
 
 // LOAD LEVEL
 const loader = new GLTFLoader();
-loader.load('./glb/demo-level.glb', (gltf: GLTF) => {
+loader.load('./glb/map-level.glb', (gltf: GLTF) => {
     scene.add(gltf.scene);
 });
 
@@ -89,7 +89,7 @@ const SPEED = 5;
 let navmesh;
 let groupID;
 let navpath;
-loader.load('./glb/demo-level-navmesh.glb', (gltf: GLTF) => {
+loader.load('./glb/map-level-navmesh.glb', (gltf: GLTF) => {
     // scene.add(gltf.scene);
     gltf.scene.traverse((node) => {
         if (!navmesh && node.isObject3D && node.children && node.children.length > 0) {
