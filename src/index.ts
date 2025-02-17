@@ -149,10 +149,40 @@ function move ( delta: number ) {
     }
 }
 
+// DRAW PATH LINE
+const pathLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 5 });
+let pathLineGeometry = new THREE.BufferGeometry();
+let pathLine: THREE.Line | null = null;
+let lineDrawSpeed = 1; // Speed control for line drawing
+let lineDrawProgress = 0;
+
+function drawPathLine(delta: number) {
+    if (!navpath || navpath.length <= 0) return;
+
+    lineDrawProgress += delta * lineDrawSpeed;
+    const points = [agentGroup.position.clone()];
+    const maxPoints = Math.min(Math.floor(lineDrawProgress), navpath.length);
+
+    for (let i = 0; i < maxPoints; i++) {
+        points.push(navpath[i].clone());
+    }
+
+    pathLineGeometry.setFromPoints(points);
+
+    if (pathLine) {
+        scene.remove(pathLine);
+    }
+
+    pathLine = new THREE.Line(pathLineGeometry, pathLineMaterial);
+    scene.add(pathLine);
+}
+
 // GAMELOOP
 const clock = new THREE.Clock();
 let gameLoop = () => {
-    move(clock.getDelta());
+    const delta = clock.getDelta();
+    move(delta);
+    drawPathLine(delta);
     orbitControls.update()
     renderer.render(scene, camera);
     requestAnimationFrame(gameLoop);
