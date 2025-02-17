@@ -70,7 +70,7 @@ agent.position.y = agentHeight / 2;
 const agentGroup = new THREE.Group();
 agentGroup.add(agent);
 agentGroup.position.z = 0;
-agentGroup.position.x = 0;
+agentGroup.position.x = 20;
 agentGroup.position.y = 1;
 scene.add(agentGroup);
 
@@ -240,9 +240,6 @@ createButton('Движение агента', () => {
         canSelectPoint = false;
     }
 });
-
-
-
 
 // GAMELOOP
 const clock = new THREE.Clock();
