@@ -2,13 +2,14 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader.js';
 import { Pathfinding, PathfindingHelper } from 'three-pathfinding';
+import { MeshLine, MeshLineMaterial } from 'three.meshline';
 
 // SCENE
 const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xa8def0);
 
 // CAMERA
-const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000); // Increased far clipping plane
 camera.position.y = 10;
 camera.position.z = 10;
 camera.position.x = 33;
@@ -150,9 +151,9 @@ function move ( delta: number ) {
 }
 
 // DRAW PATH LINE
-const pathLineMaterial = new THREE.LineBasicMaterial({ color: 0xff0000, linewidth: 5 });
+const pathLineMaterial = new MeshLineMaterial({ color: 0xff0000, lineWidth: 0.5 });
 let pathLineGeometry = new THREE.BufferGeometry();
-let pathLine: THREE.Line | null = null;
+let pathLine: THREE.Mesh | null = null;
 let lineDrawSpeed = 1; // Speed control for line drawing
 let lineDrawProgress = 0;
 
@@ -178,13 +179,14 @@ function drawPathLine(delta: number) {
         }
     }
 
-    pathLineGeometry.setFromPoints(points);
+    const line = new MeshLine();
+    line.setPoints(points.flatMap(p => [p.x, p.y, p.z]));
 
     if (pathLine) {
         scene.remove(pathLine);
     }
 
-    pathLine = new THREE.Line(pathLineGeometry, pathLineMaterial);
+    pathLine = new THREE.Mesh(line, pathLineMaterial);
     scene.add(pathLine);
 }
 
