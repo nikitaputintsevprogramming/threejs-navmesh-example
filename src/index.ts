@@ -9,7 +9,7 @@ const scene = new THREE.Scene();
 scene.background = new THREE.Color(0xa8def0);
 
 // CAMERA
-const camera = new THREE.PerspectiveCamera(70, window.innerWidth / window.innerHeight, 0.1, 2000); // Increased far clipping plane
+const camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 2000); // Increased far clipping plane
 camera.position.y = 10;
 camera.position.z = 10;
 camera.position.x = 33;
@@ -259,6 +259,13 @@ const mouse = new THREE.Vector2();
 // Для хранения исходного материала, чтобы вернуть его обратно после окончания выделения
 let originalMaterial = null;
 
+// Create a sprite for the cursor
+const spriteMap = new THREE.TextureLoader().load('./glb/cursor.png'); // Replace with your sprite path
+const spriteMaterial = new THREE.SpriteMaterial({ map: spriteMap });
+const sprite = new THREE.Sprite(spriteMaterial);
+sprite.scale.set(0.5, 0.5, 1); // Adjust the scale as needed
+scene.add(sprite);
+
 // Слушатель события движения мыши
 window.addEventListener('mousemove', (event) => {
     // Нормализуем координаты мыши
@@ -297,6 +304,12 @@ window.addEventListener('mousemove', (event) => {
                 originalMaterial = null; // Сбрасываем
             }
         }
+    }
+
+    // Update sprite position
+    const intersectsSprite = raycaster.intersectObjects(scene.children, true);
+    if (intersectsSprite.length > 0) {
+        sprite.position.copy(intersectsSprite[0].point);
     }
 });
 
