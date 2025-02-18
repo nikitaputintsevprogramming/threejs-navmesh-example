@@ -253,6 +253,82 @@ createButton('Движение агента', () => {
     }
 });
 
+// Вектор для хранения положения мыши
+const mouse = new THREE.Vector2();
+
+// Для хранения исходного материала, чтобы вернуть его обратно после окончания выделения
+let originalMaterial = null;
+
+// Слушатель события движения мыши
+window.addEventListener('mousemove', (event) => {
+    // Нормализуем координаты мыши
+    mouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    mouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Обновляем луч
+    raycaster.setFromCamera(mouse, camera);
+
+    // Проверяем пересечение с объектами в сцене
+    const intersects = raycaster.intersectObjects(scene.children, true); // Используем true для глубокого поиска
+
+    // Сбрасываем выделение, если ничего не найдено
+    if (intersects.length > 0) {
+        const intersectedObject = intersects[0].object;
+        if (intersectedObject.name === 'Lift1' && originalMaterial === null) {
+            // Запоминаем исходный материал
+            originalMaterial = (intersectedObject as THREE.Mesh).material;
+
+            // Меняем материал на выделенный
+            (intersectedObject as THREE.Mesh).material = new THREE.MeshBasicMaterial({ color: 0xff0000 }); // Красный для выделения
+        } else if (intersectedObject.name !== 'Lift1' && originalMaterial !== null) {
+            // Если курсор переместился на другой объект, восстанавливаем исходный материал
+            const lift1Object = scene.getObjectByName('Lift1');
+            if (lift1Object) {
+                (lift1Object as THREE.Mesh).material = originalMaterial;
+                originalMaterial = null; // Сбрасываем
+            }
+        }
+    } else {
+        // Если ничего не найдено, восстанавливаем исходный материал
+        if (originalMaterial) {
+            const lift1Object = scene.getObjectByName('Lift1');
+            if (lift1Object) {
+                (lift1Object as THREE.Mesh).material = originalMaterial;
+                originalMaterial = null; // Сбрасываем
+            }
+        }
+    }
+});
+
+// Слушатель события клика
+window.addEventListener('click', (event) => {
+    // Нормализуем координаты мыши
+    clickMouse.x = (event.clientX / window.innerWidth) * 2 - 1;
+    clickMouse.y = -(event.clientY / window.innerHeight) * 2 + 1;
+
+    // Обновляем луч
+    raycaster.setFromCamera(clickMouse, camera);
+
+    // Проверяем пересечение с объектами в сцене
+    const intersects = raycaster.intersectObjects(scene.children, true); // Используем true для глубокого поиска
+
+    if (intersects.length > 0) {
+        const target = intersects[0].point;
+        const agentpos = agentGroup.position;
+
+        groupID = pathfinding.getGroup(ZONE, agentGroup.position);
+        // find closest node to agent, just in case agent is out of bounds
+        const closest = pathfinding.getClosestNode(agentpos, ZONE, groupID);
+        navpath = pathfinding.findPath(closest.centroid, target, ZONE, groupID);
+        if (navpath) {
+            pathfindinghelper.reset();
+            pathfindinghelper.setPlayerPosition(agentpos);
+            pathfindinghelper.setTargetPosition(target);
+            pathfindinghelper.setPath(navpath);
+        }
+    }
+});
+
 // Обновленный игровой цикл
 const clock = new THREE.Clock();
 const gameLoop = () => {
